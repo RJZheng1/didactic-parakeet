@@ -36,15 +36,18 @@ def draw_polygons( points, screen, color, z_buffer ):
 
 def scanline_convert(p0, p1, p2, screen, color, z_buffer):
     tri = sorted([p0, p1, p2], key = lambda p:p[1])
-    
-    TBx = (tri[2][0]-tri[0][0])/(tri[2][1]-tri[0][1])
-    TBz = (tri[2][2]-tri[0][2])/(tri[2][1]-tri[0][1])
+    for p in tri:
+        for i in xrange(len(p)):
+            p[i] = int(p[i])
+
+    TBx = float((tri[2][0]-tri[0][0]))/(tri[2][1]-tri[0][1])
+    TBz = float((tri[2][2]-tri[0][2]))/(tri[2][1]-tri[0][1])
     if tri[2][1] != tri[1][1]:
-        TMx = (tri[2][0]-tri[1][0])/(tri[2][1]-tri[1][1])
-        TMz = (tri[2][2]-tri[1][2])/(tri[2][1]-tri[1][1])
+        TMx = float((tri[2][0]-tri[1][0]))/(tri[2][1]-tri[1][1])
+        TMz = float((tri[2][2]-tri[1][2]))/(tri[2][1]-tri[1][1])
     if tri[1][1] != tri[0][1]:
-        MBx = (tri[1][0]-tri[0][0])/(tri[1][1]-tri[0][1])
-        MBz = (tri[1][2]-tri[0][2])/(tri[1][1]-tri[0][1])
+        MBx = float((tri[1][0]-tri[0][0]))/(tri[1][1]-tri[0][1])
+        MBz = float((tri[1][2]-tri[0][2]))/(tri[1][1]-tri[0][1])
 
     if tri[0][1] != tri[1][1]:
         x0 = tri[0][0]
@@ -67,7 +70,7 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer):
         x0 += TBx
         z0 += TBz
         draw_line(screen, x0, y, z0, x1, y, z1, color, z_buffer)
-        
+
 def add_box( points, x, y, z, width, height, depth ):
     x1 = x + width
     y1 = y - height
@@ -341,8 +344,13 @@ def draw_line( screen, x0, y0, z0, x1, y1, z1, color, z_buffer ):
         tmp = y0
         y0 = y1
         y1 = tmp
-    
-    if dx == 0:
+        tmp = z0
+        z0 = z1
+        z1 = tmp
+
+    if dx == 0 and dy == 0:
+        plot(screen, color, x0, y0, max(z0, z1), z_buffer)
+    elif dx == 0:
         y = y0
         z = z0
         while y <= y1:
