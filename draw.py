@@ -1,7 +1,7 @@
 from display import *
 from matrix import *
 from gmath import calculate_dot
-from math import cos, sin, pi
+from math import cos, sin, pi, floor
 from random import randint
 
 MAX_STEPS = 100
@@ -11,7 +11,7 @@ def add_polygon( points, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
     add_point( points, x1, y1, z1 )
     add_point( points, x2, y2, z2 )
     
-def draw_polygons( points, screen, color, z_buffer ):
+def draw_polygons( points, screen, color, z_buffer, point_sources, reflection, shading_type):
 
     if len(points) < 3:
         print 'Need at least 3 points to draw a polygon!'
@@ -21,14 +21,14 @@ def draw_polygons( points, screen, color, z_buffer ):
     while p < len( points ) - 2:
 
         if calculate_dot( points, p ) < 0:
-            '''
-            draw_line( screen, points[p][0], points[p][1], points[p][2],
-                       points[p+1][0], points[p+1][1], points[p][2], color, z_buffer )
-            draw_line( screen, points[p+1][0], points[p+1][1], points[p+1][2],
-                       points[p+2][0], points[p+2][1], points[p+2][2], color, z_buffer)
-            draw_line( screen, points[p+2][0], points[p+2][1], points[p+2][2],
-                       points[p][0], points[p][1], points[p][2], color, z_buffer)
-            '''
+            if shading_type == "wireframe":
+                draw_line( screen, points[p][0], points[p][1], points[p][2],
+                           points[p+1][0], points[p+1][1], points[p][2], color, z_buffer )
+                draw_line( screen, points[p+1][0], points[p+1][1], points[p+1][2],
+                           points[p+2][0], points[p+2][1], points[p+2][2], color, z_buffer)
+                draw_line( screen, points[p+2][0], points[p+2][1], points[p+2][2],
+                           points[p][0], points[p][1], points[p][2], color, z_buffer)
+        else:
             
             scanline_convert( points[p], points[p+1], points[p+2], screen, [randint(0, 255), randint(0, 255), randint(0, 255)], z_buffer)
             
@@ -38,7 +38,7 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer):
     tri = sorted([p0, p1, p2], key = lambda p:p[1])
     for p in tri:
         for i in xrange(len(p)):
-            p[i] = int(p[i])
+            p[i] = floor(p[i])
 
     TBx = float((tri[2][0]-tri[0][0]))/(tri[2][1]-tri[0][1])
     TBz = float((tri[2][2]-tri[0][2]))/(tri[2][1]-tri[0][1])

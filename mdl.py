@@ -41,7 +41,8 @@ tokens = (
     "DISPLAY", 
     "SCREEN", 
     "WEB", 
-    "CO"
+    "CO",
+    "REFLECTION"
 )
 
 reserved = {
@@ -85,7 +86,8 @@ reserved = {
     "set_knobs" : "SET_KNOBS", 
     "focal" : "FOCAL", 
     "display" : "DISPLAY", 
-    "web" : "WEB"
+    "web" : "WEB",
+    "reflection" : "REFLECTION"
 }
 
 t_ignore = " \t"
@@ -253,6 +255,22 @@ def p_statement_rotate(p):
     else:
         commands.append(tuple(p[1:]))
         symbols.append(("knob", p[4]))
+
+def p_statement_shading(p):
+    """statement: SHADING SHADING_TYPE"""
+    commands.append(tuple(p[1:]))
+
+def p_statement_ambient(p):
+    """statement: AMBIENT INT INT INT"""
+    commands.append(tuple(p[1:]))
+
+def p_statement_light(p):
+    """statement: LIGHT NUMBER NUMBER NUMBER INT INT INT"""
+    commands.append(tuple(p[1:]))
+
+def p_statement_reflection(p):
+    """statement: REFLECTION NUMBER NUMBER NUMBER"""
+    commands.append(tuple(p[1:]))
 
 def p_SYMBOL(p):
     """SYMBOL : XYZ
