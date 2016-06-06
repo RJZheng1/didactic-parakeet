@@ -43,10 +43,15 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, reflection, s
                 for l in point_sources:
                     l = normalize(l)
                     diffuse_light = [color[x]*reflection[x*3]*dot_product(normal, l) for x in xrange(len(reflection)/3)]
-                    idiffuse += diffuse_light if diffuse_light > 0 else 0
-                    specular_light = [color[x]*reflection[x*3]*pow(dot_product(sub_vectors(scalar_product(scalar_product(normal, dot_product(l, normal)), 2), l), view), 2) for x in xrange(len(reflection)/3)]
-                    ispecular += specular_light if specular_light > 0 else 0
-                scanline_convert( points[p], points[p+1], points[p+2], screen, [randint(0, 255), randint(0, 255), randint(0, 255)], z_buffer)
+                    idiffuse = [x + y if y > 0 else 0 for x,y in zip(idiffuse, diffuse_light)]
+                    angle = pow(dot_product(sub_vectors(scalar_product(scalar_product(normal, dot_product(l, normal)), 2), l), view), 2)
+                    specular_light = [color[x]*reflection[x*3]*angle for x in xrange(len(reflection)/3)]
+                    ispecular = [x + y if y > 0 else 0 for x,y in zip(ispecular, specular_light)]
+                c = [x + y + z for x,y,z in zip(iambient, idiffuse, ispecular)]
+                if len(c) == 1:
+                    append(c[0])
+                    append(c[0])
+                scanline_convert( points[p], points[p+1], points[p+2], screen, c, z_buffer)
             
         p += 3
 

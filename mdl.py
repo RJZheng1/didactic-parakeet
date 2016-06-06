@@ -80,14 +80,14 @@ reserved = {
     "shading" : "SHADING", 
     "phong" : "SHADING_TYPE", 
     "flat" : "SHADING_TYPE", 
-    "gouraud" : "SHADING_TYPE", 
+    "ground" : "SHADING_TYPE", 
     "raytrace" : "SHADING_TYPE", 
     "wireframe" : "SHADING_TYPE", 
     "set_knobs" : "SET_KNOBS", 
     "focal" : "FOCAL", 
     "display" : "DISPLAY", 
     "web" : "WEB",
-    "reflection" : "REFLECTION"
+    "reflection": "REFLECTION"
 }
 
 t_ignore = " \t"
@@ -257,19 +257,19 @@ def p_statement_rotate(p):
         symbols.append(("knob", p[4]))
 
 def p_statement_shading(p):
-    """statement: SHADING SHADING_TYPE"""
+    """statement : SHADING SHADING_TYPE"""
     commands.append(tuple(p[1:]))
 
 def p_statement_ambient(p):
-    """statement: AMBIENT INT INT INT"""
+    """statement : AMBIENT INT INT INT"""
     commands.append(tuple(p[1:]))
 
 def p_statement_light(p):
-    """statement: LIGHT NUMBER NUMBER NUMBER INT INT INT"""
+    """statement : LIGHT NUMBER NUMBER NUMBER INT INT INT"""
     commands.append(tuple(p[1:]))
 
 def p_statement_reflection(p):
-    """statement: REFLECTION NUMBER NUMBER NUMBER
+    """statement : REFLECTION NUMBER NUMBER NUMBER
                 | REFLECTION NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER"""
     commands.append(tuple(p[1:]))
 
