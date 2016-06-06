@@ -167,7 +167,7 @@ def run(filename):
     """
     color = [255, 255, 255]
     tmp = new_matrix()
-    point_sources =[]
+    point_sources = []
     reflection = [1.0, 0.0, 0.0]
     shading_type = "wireframe"
     ident( tmp )
@@ -212,19 +212,19 @@ def run(filename):
                 m = []
                 add_sphere(m, command[1], command[2], command[3], command[4], 5)
                 matrix_mult(stack[-1], m)
-                draw_polygons( m, screen, color, z_buffer )
+                draw_polygons( m, screen, color, z_buffer, point_sources, reflection, shading_type )
 
             elif command[0] == "torus":
                 m = []
                 add_torus(m, command[1], command[2], command[3], command[4], command[5], 5)
                 matrix_mult(stack[-1], m)
-                draw_polygons( m, screen, color, z_buffer )
+                draw_polygons( m, screen, color, z_buffer, point_sources, reflection, shading_type )
 
             elif command[0] == "box":                
                 m = []
                 add_box(m, *command[1:])
                 matrix_mult(stack[-1], m)
-                draw_polygons( m, screen, color, z_buffer )
+                draw_polygons( m, screen, color, z_buffer, point_sources, reflection, shading_type )                
 
             elif command[0] == "line":
                 m = []
@@ -307,7 +307,7 @@ def run(filename):
 
             elif command[0] == "reflection":
                 reflection = command[1:]
-            
+        
         if num_frames > 1:
             fname = 'anim/%s%03d.png' % (name, f)
             print 'Drawing frame: ' + fname

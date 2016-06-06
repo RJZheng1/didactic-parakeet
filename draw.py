@@ -1,7 +1,7 @@
 from display import *
 from matrix import *
 from gmath import calculate_dot
-from math import cos, sin, pi, floor
+from math import cos, sin, pi, floor, pow
 from random import randint
 
 MAX_STEPS = 100
@@ -28,9 +28,25 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, reflection, s
                            points[p+2][0], points[p+2][1], points[p+2][2], color, z_buffer)
                 draw_line( screen, points[p+2][0], points[p+2][1], points[p+2][2],
                            points[p][0], points[p][1], points[p][2], color, z_buffer)
-        else:
-            
-            scanline_convert( points[p], points[p+1], points[p+2], screen, [randint(0, 255), randint(0, 255), randint(0, 255)], z_buffer)
+                
+            elif shading_type == "flat":
+                if len(reflection) == 3:
+                    color[0] = (color[0]+color[1]+color[2])/3
+                    color[1] = color[0]
+                    color[2] = color[0]
+                c = []
+                iambient = [color[x]*reflection[x] for x in xrange(len(reflection)/3)]
+                idiffuse = [0, 0, 0]
+                ispecular = [0, 0, 0]
+                normal = normalize(calculate_normal(points[p][0], points[p][1], points[p][2], points[p+1][0], points[p+1][1], points[p+1][2]))
+                view = [0, 0, -1]
+                for l in point_sources:
+                    l = normalize(l)
+                    diffuse_light = [color[x]*reflection[x*3]*dot_product(normal, l) for x in xrange(len(reflection)/3)]
+                    idiffuse += diffuse_light if diffuse_light > 0 else 0
+                    specular_light = [color[x]*reflection[x*3]*pow(dot_product(sub_vectors(scalar_product(scalar_product(normal, dot_product(l, normal)), 2), l), view), 2) for x in xrange(len(reflection)/3)]
+                    ispecular += specular_light if specular_light > 0 else 0
+                scanline_convert( points[p], points[p+1], points[p+2], screen, [randint(0, 255), randint(0, 255), randint(0, 255)], z_buffer)
             
         p += 3
 

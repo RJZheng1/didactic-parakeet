@@ -80,7 +80,7 @@ reserved = {
     "shading" : "SHADING", 
     "phong" : "SHADING_TYPE", 
     "flat" : "SHADING_TYPE", 
-    "ground" : "SHADING_TYPE", 
+    "gouraud" : "SHADING_TYPE", 
     "raytrace" : "SHADING_TYPE", 
     "wireframe" : "SHADING_TYPE", 
     "set_knobs" : "SET_KNOBS", 
@@ -269,7 +269,8 @@ def p_statement_light(p):
     commands.append(tuple(p[1:]))
 
 def p_statement_reflection(p):
-    """statement: REFLECTION NUMBER NUMBER NUMBER"""
+    """statement: REFLECTION NUMBER NUMBER NUMBER
+                | REFLECTION NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER"""
     commands.append(tuple(p[1:]))
 
 def p_SYMBOL(p):

@@ -1,3 +1,5 @@
+from math import sqrt
+
 def calculate_normal( ax, ay, az, bx, by, bz ):
     normal = [0,0,0]
     normal[0] = ay * bz - az * by
@@ -26,3 +28,16 @@ def calculate_dot( points, i ):
     dot = normal[0] * vx + normal[1] * vy + normal[2] * vz
     
     return dot
+
+def normalize(v):
+    magnitude = sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2])
+    return [v[x]/magnitude for x in xrange(3)]
+
+def scalar_product(v, s):
+    return [v[x]*s for x in xrange(len(v))]
+
+def dot_product(v0, v1):
+    return [v0[x] * v1[x] for x in xrange(len(v0))]
+
+def sub_vectors(v0, v1):
+    return [v0[x]-v1[x] for x in xrange(len(v0))]
