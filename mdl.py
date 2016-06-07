@@ -41,8 +41,7 @@ tokens = (
     "DISPLAY", 
     "SCREEN", 
     "WEB", 
-    "CO",
-    "REFLECTION"
+    "CO"
 )
 
 reserved = {
@@ -86,8 +85,7 @@ reserved = {
     "set_knobs" : "SET_KNOBS", 
     "focal" : "FOCAL", 
     "display" : "DISPLAY", 
-    "web" : "WEB",
-    "reflection": "REFLECTION"
+    "web" : "WEB"
 }
 
 t_ignore = " \t"
@@ -268,9 +266,8 @@ def p_statement_light(p):
     """statement : LIGHT NUMBER NUMBER NUMBER INT INT INT"""
     commands.append(tuple(p[1:]))
 
-def p_statement_reflection(p):
-    """statement : REFLECTION NUMBER NUMBER NUMBER
-                | REFLECTION NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER"""
+def p_statement_constants(p):
+    """statement : CONSTANTS NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER NUMBER"""
     commands.append(tuple(p[1:]))
 
 def p_SYMBOL(p):

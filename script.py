@@ -168,7 +168,7 @@ def run(filename):
     color = [255, 255, 255]
     tmp = new_matrix()
     point_sources = []
-    reflection = [1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    constants = [1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     shading_type = "flat"
     ident( tmp )
 
@@ -212,19 +212,19 @@ def run(filename):
                 m = []
                 add_sphere(m, command[1], command[2], command[3], command[4], 5)
                 matrix_mult(stack[-1], m)
-                draw_polygons( m, screen, color, z_buffer, point_sources, reflection, shading_type )
+                draw_polygons( m, screen, color, z_buffer, point_sources, constants, shading_type )
 
             elif command[0] == "torus":
                 m = []
                 add_torus(m, command[1], command[2], command[3], command[4], command[5], 5)
                 matrix_mult(stack[-1], m)
-                draw_polygons( m, screen, color, z_buffer, point_sources, reflection, shading_type )
+                draw_polygons( m, screen, color, z_buffer, point_sources, constants, shading_type )
 
             elif command[0] == "box":                
                 m = []
                 add_box(m, *command[1:])
                 matrix_mult(stack[-1], m)
-                draw_polygons( m, screen, color, z_buffer, point_sources, reflection, shading_type )                
+                draw_polygons( m, screen, color, z_buffer, point_sources, constants, shading_type )                
 
             elif command[0] == "line":
                 m = []
@@ -236,19 +236,19 @@ def run(filename):
                 m = []
                 add_curve(m, command[1], command[2], command[3], command[4], command[5], command[6], command[7], command[8], .05, 'bezier')
                 matrix_mult(stack[-1], m)
-                draw_lines( m, screen, color )
+                draw_lines( m, screen, color, z_buffer )
 
             elif command[0] == "hermite":
                 m = []
                 add_curve(m, command[1], command[2], command[3], command[4], command[5], command[6], command[7], command[8], .05, 'hermite')
                 matrix_mult(stack[-1], m)
-                draw_lines( m, screen, color )
+                draw_lines( m, screen, color, z_buffer )
 
             elif command[0] == "circle":
                 m = []
                 add_circle(m, command[1], command[2], command[3], command[4], .05)
                 matrix_mult(stack[-1], m)
-                draw_lines( m, screen, color )
+                draw_lines( m, screen, color, z_buffer )
 
             elif command[0] == "move":                
                 xval = command[1]
@@ -305,8 +305,8 @@ def run(filename):
             elif command[0] == "light":
                 point_sources.append(command[1:])
 
-            elif command[0] == "reflection":
-                reflection = command[1:]
+            elif command[0] == "constants":
+                constants = command[1:]
         
         if num_frames > 1:
             fname = 'anim/%s%03d.png' % (name, f)

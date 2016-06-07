@@ -18,7 +18,7 @@ def calculate_dot( points, i ):
     bz = points[i + 2][2] - points[ i ][2]
 
     normal = calculate_normal( ax, ay, az, bx, by, bz )
-
+    
     #set up the view vector values
     vx = 0
     vy = 0
@@ -37,7 +37,7 @@ def scalar_product(v, s):
     return [v[x]*s for x in xrange(len(v))]
 
 def dot_product(v0, v1):
-    return [v0[x] * v1[x] for x in xrange(len(v0))]
+    return v0[0]*v1[0]+v0[1]*v1[1]+v0[2]*v1[2]
 
 def sub_vectors(v0, v1):
     return [v0[x]-v1[x] for x in xrange(len(v0))]
