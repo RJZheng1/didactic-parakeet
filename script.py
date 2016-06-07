@@ -168,8 +168,8 @@ def run(filename):
     color = [255, 255, 255]
     tmp = new_matrix()
     point_sources = []
-    reflection = [1.0, 0.0, 0.0]
-    shading_type = "wireframe"
+    reflection = [1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    shading_type = "flat"
     ident( tmp )
 
     p = mdl.parseFile(filename)

@@ -1,6 +1,6 @@
 from display import *
 from matrix import *
-from gmath import calculate_dot
+from gmath import *
 from math import cos, sin, pi, floor, pow
 from random import randint
 
@@ -13,11 +13,17 @@ def add_polygon( points, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
     
 def draw_polygons( points, screen, color, z_buffer, point_sources, reflection, shading_type):
 
+    if len(reflection) == 3:
+        color[0] = (color[0]+color[1]+color[2])/3
+        color[1] = color[0]
+        color[2] = color[0]
+        
     if len(points) < 3:
         print 'Need at least 3 points to draw a polygon!'
         return
 
     p = 0
+
     while p < len( points ) - 2:
 
         if calculate_dot( points, p ) < 0:
@@ -30,27 +36,30 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, reflection, s
                            points[p][0], points[p][1], points[p][2], color, z_buffer)
                 
             elif shading_type == "flat":
-                if len(reflection) == 3:
-                    color[0] = (color[0]+color[1]+color[2])/3
-                    color[1] = color[0]
-                    color[2] = color[0]
                 c = []
+                
                 iambient = [color[x]*reflection[x] for x in xrange(len(reflection)/3)]
                 idiffuse = [0, 0, 0]
                 ispecular = [0, 0, 0]
-                normal = normalize(calculate_normal(points[p][0], points[p][1], points[p][2], points[p+1][0], points[p+1][1], points[p+1][2]))
+                
+                normal = normalize(calculate_normal(points[p][0], points[p][1], points[p][2], points[p+1][0], points[p+1][1], points[p+1][2]))                
                 view = [0, 0, -1]
+                
                 for l in point_sources:
                     l = normalize(l)
+                    
                     diffuse_light = [color[x]*reflection[x*3]*dot_product(normal, l) for x in xrange(len(reflection)/3)]
                     idiffuse = [x + y if y > 0 else 0 for x,y in zip(idiffuse, diffuse_light)]
+                    
                     angle = pow(dot_product(sub_vectors(scalar_product(scalar_product(normal, dot_product(l, normal)), 2), l), view), 2)
                     specular_light = [color[x]*reflection[x*3]*angle for x in xrange(len(reflection)/3)]
                     ispecular = [x + y if y > 0 else 0 for x,y in zip(ispecular, specular_light)]
-                c = [x + y + z for x,y,z in zip(iambient, idiffuse, ispecular)]
+
+                c = [int(x + y + z) for x,y,z in zip(iambient, idiffuse, ispecular)]
                 if len(c) == 1:
-                    append(c[0])
-                    append(c[0])
+                    c.append(c[0])
+                    c.append(c[0])
+                    
                 scanline_convert( points[p], points[p+1], points[p+2], screen, c, z_buffer)
             
         p += 3
