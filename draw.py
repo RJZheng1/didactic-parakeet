@@ -17,10 +17,15 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, constants, sh
         return
 
     p = 0
+    view = [0, 0, -1]
+    vertex_normals = {}
+
+    if shading_type == 'gouraund' or shading_type == 'phong':
+        pass
 
     while p < len( points ) - 2:
 
-        if calculate_dot( points, p ) < 0:
+        if dot_product(view, calculate_normal( points, p )) < 0:
             if shading_type == "wireframe":
                 draw_line( screen, points[p][0], points[p][1], points[p][2],
                            points[p+1][0], points[p+1][1], points[p][2], color, z_buffer )
@@ -36,21 +41,20 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, constants, sh
                 idiffuse = [0, 0, 0]
                 ispecular = [0, 0, 0]
                 
-                normal = normalize(calculate_normal(points[p+1][0]-points[p][0], points[p+1][1]-points[p][1], points[p+1][2]-points[p][2], points[p+2][0]-points[p+1][0], points[p+2][1]-points[p+1][1], points[p+2][2]-points[p+1][2]))
-                view = [0, 0, -1]
+                normal = normalize(calculate_normal(points, p))
                 
                 for light in point_sources:
                     l = normalize(light[0:3])
                     
                     diffuse_light = [light[x+3]*constants[x+3]*dot_product(normal, l) for x in xrange(3)]
-                    idiffuse = [x + y if y > 0 else 0 for x,y in zip(idiffuse, diffuse_light)]
+                    idiffuse = [idiffuse[x] + (diffuse_light[x] if diffuse_light[x] > 0 else 0) for x in xrange(3)]
                     
                     angle = pow(dot_product(sub_vectors(scalar_product(scalar_product(normal, dot_product(l, normal)), 2), l), view), 2)
                     specular_light = [light[x+3]*constants[x+6]*angle for x in xrange(3)]
-                    ispecular = [x + y if y > 0 else 0 for x,y in zip(ispecular, specular_light)]
-
+                    ispecular = [ispecular[x] + (specular_light[x] if specular_light[x] > 0 else 0) for x in xrange(3)]
+                    
                 c = [int(x + y + z) for x,y,z in zip(iambient, idiffuse, ispecular)]
-
+                
                 scanline_convert( points[p], points[p+1], points[p+2], screen, c, z_buffer)
             
         p += 3
