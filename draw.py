@@ -53,7 +53,7 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, constants, sh
                     specular_light = [light[x+3]*constants[x+6]*angle for x in xrange(3)]
                     ispecular = [ispecular[x] + (specular_light[x] if specular_light[x] > 0 else 0) for x in xrange(3)]
                     
-                c = [int(x + y + z) for x,y,z in zip(iambient, idiffuse, ispecular)]
+                c = [int(iambient[x]+idiffuse[x]+ispecular[x]) for x in xrange(3)]
                 
                 scanline_convert( points[p], points[p+1], points[p+2], screen, c, z_buffer)
             
