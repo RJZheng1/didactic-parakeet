@@ -20,8 +20,28 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, constants, sh
     view = [0, 0, -1]
     vertex_normals = {}
 
-    if shading_type == 'gouraund' or shading_type == 'phong':
-        pass
+    if shading_type == 'gouraud' or shading_type == 'phong':
+        while p < len( points ) - 2:
+            normal = calculate_normal(points, p)
+            if not tuple(points[p]) in vertex_normals:
+                vertex_normals[tuple(points[p])] = normal
+            else:
+                vertex_normals[tuple(points[p])] += normal
+            if not tuple(points[p+1]) in vertex_normals:
+                vertex_normals[tuple(points[p+1])] = normal
+            else:
+                vertex_normals[tuple(points[p+1])] += normal
+            if not tuple(points[p+2]) in vertex_normals:
+                vertex_normals[tuple(points[p+2])] = normal
+            else:
+                vertex_normals[tuple(points[p+2])] += normal
+
+            p += 3
+            
+    for x in vertex_normals.keys():
+        vertex_normals[x] = normalize(vertex_normals[x])
+
+    p = 0
 
     while p < len( points ) - 2:
 
@@ -55,11 +75,25 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, constants, sh
                     
                 c = [int(iambient[x]+idiffuse[x]+ispecular[x]) for x in xrange(3)]
                 
-                scanline_convert( points[p], points[p+1], points[p+2], screen, c, z_buffer)
+                scanline_convert( points[p], points[p+1], points[p+2], screen, c, z_buffer, "flat", 0, 0, 0)
+
+            elif shading_type == "gouraud":
+                normal0 = vertex_normals(tuple(point[p]))
+                normal1 = vertex_normals(tuple(point[p+1]))
+                normal2 = vertex_normals(tuple(point[p+2]))
+                
+                #scanline_convert( points[p], points[p+1], points[p+2], screen, 0, z_buffer, "gouraud", normal0, normal1, normal2)
+
+            elif shading_type == "phong":
+                normal0 = vertex_normals(tuple(point[p]))
+                normal1 = vertex_normals(tuple(point[p+1]))
+                normal2 = vertex_normals(tuple(point[p+2]))
+                
+                #scanline_convert( points[p], points[p+1], points[p+2], screen, 0, z_buffer, "phong", normal0, normal1, normal2)
             
         p += 3
 
-def scanline_convert(p0, p1, p2, screen, color, z_buffer):
+def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type, normal0, normal1, normal2):
     tri = sorted([p0, p1, p2], key = lambda p:p[1])
     for p in tri:
         for i in xrange(len(p)):
@@ -94,7 +128,8 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer):
             z1 += MBz
         x0 += TBx
         z0 += TBz
-        draw_line(screen, x0, y, z0, x1, y, z1, color, z_buffer)
+        if shading_type == "flat":
+            draw_line(screen, x0, y, z0, x1, y, z1, color, z_buffer)
 
 def add_box( points, x, y, z, width, height, depth ):
     x1 = x + width

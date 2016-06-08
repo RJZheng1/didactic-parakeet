@@ -79,7 +79,7 @@ reserved = {
     "shading" : "SHADING", 
     "phong" : "SHADING_TYPE", 
     "flat" : "SHADING_TYPE", 
-    "ground" : "SHADING_TYPE", 
+    "gouraud" : "SHADING_TYPE", 
     "raytrace" : "SHADING_TYPE", 
     "wireframe" : "SHADING_TYPE", 
     "set_knobs" : "SET_KNOBS", 

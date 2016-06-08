@@ -2,5 +2,6 @@
 *pyc
 *out
 parsetab.py
-*ppm
+*.ppm
+*.png
 *.gif
