@@ -73,8 +73,8 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, constants, sh
                     specular_light = [light[x+3]*constants[x+6]*angle for x in xrange(3)]
                     ispecular = [ispecular[x] + (specular_light[x] if specular_light[x] > 0 else 0) for x in xrange(3)]
                     
-                c = [int(iambient[x]+idiffuse[x]+ispecular[x]) for x in xrange(3)]
-                
+                c = [min(255, int(iambient[x]+idiffuse[x]+ispecular[x])) for x in xrange(3)]
+
                 scanline_convert( points[p], points[p+1], points[p+2], screen, c, z_buffer, "flat", 0, 0, 0)
 
             elif shading_type == "gouraud":
@@ -99,14 +99,26 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type, normal0,
         for i in xrange(len(p)):
             p[i] = floor(p[i])
 
-    TBx = float((tri[2][0]-tri[0][0]))/(tri[2][1]-tri[0][1])
-    TBz = float((tri[2][2]-tri[0][2]))/(tri[2][1]-tri[0][1])
+    if tri[2][1] != tri[0][1]:
+        TBx = float((tri[2][0]-tri[0][0]))/(tri[2][1]-tri[0][1])
+        TBz = float((tri[2][2]-tri[0][2]))/(tri[2][1]-tri[0][1])
+    else:
+        TBx = 0
+        TBz = 0
+        
     if tri[2][1] != tri[1][1]:
         TMx = float((tri[2][0]-tri[1][0]))/(tri[2][1]-tri[1][1])
         TMz = float((tri[2][2]-tri[1][2]))/(tri[2][1]-tri[1][1])
+    else:
+        TMx = 0
+        TMz = 0
+    
     if tri[1][1] != tri[0][1]:
         MBx = float((tri[1][0]-tri[0][0]))/(tri[1][1]-tri[0][1])
         MBz = float((tri[1][2]-tri[0][2]))/(tri[1][1]-tri[0][1])
+    else:
+        MBx = 0
+        MBz = 0
 
     if tri[0][1] != tri[1][1]:
         x0 = tri[0][0]

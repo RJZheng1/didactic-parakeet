@@ -53,7 +53,8 @@ import mdl
 from display import *
 from matrix import *
 from draw import *
-
+from os import mkdir
+from shutil import rmtree
 
 """======== first_pass( commands, symbols ) ==========
 
@@ -98,7 +99,10 @@ def first_pass( commands ):
     elif frameCheck and not nameCheck:
         print 'Animation code present but basename was not set. Using "frame" as basename.'
         name = 'frame'
-    
+
+    rmtree('anim')
+    mkdir('anim')
+        
     return (name, num_frames)
         
 
@@ -137,28 +141,19 @@ def second_pass( commands, num_frames ):
                 print 'Invalid vary command for knob: ' + knob
                 exit()
             
-            if startValue < endValue:
-                step = (float(endValue) - startValue) / (float(endFrame - startFrame))
-            else:
-                step = (float(endValue) - startValue) / (float(endFrame - startFrame))
-
-            for f in range( num_frames ):
+            step = (float(endValue) - startValue) / (float(endFrame - startFrame))
+            print step
+            for f in range( startFrame, endFrame+1 ):
 
                 frame = frames[f]
                 
-                if f < startFrame:
-                    value = startValue
+                if startValue < endValue:
+                    value = (f - startFrame) * step + startValue
 
-                elif f > endFrame:
-                    value = endValue
-
-                else:
-                    if startValue < endValue:
-                        value = (f - startFrame) * step + startValue
-                    else:
-                        value = (startFrame - f) * step
-                
                 frame[knob] = value
+
+    exit()
+            
     return frames
 
 def run(filename):
@@ -182,7 +177,7 @@ def run(filename):
 
     (name, num_frames) = first_pass( commands )
     knobs = second_pass( commands, num_frames )
-
+    
     for f in range( num_frames ):
 
         stack = [ tmp ]
@@ -250,7 +245,7 @@ def run(filename):
                 matrix_mult(stack[-1], m)
                 draw_lines( m, screen, color, z_buffer )
 
-            elif command[0] == "move":                
+            elif command[0] == "move":
                 xval = command[1]
                 yval = command[2]
                 zval = command[3]
@@ -275,7 +270,7 @@ def run(filename):
                     xval*= knob
                     yval*= knob
                     zval*= knob
-
+                    
                 t = make_scale(xval, yval, zval)
                 matrix_mult( stack[-1], t )
                 stack[-1] = t
