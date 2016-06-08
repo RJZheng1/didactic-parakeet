@@ -100,7 +100,7 @@ def first_pass( commands ):
         print 'Animation code present but basename was not set. Using "frame" as basename.'
         name = 'frame'
 
-    rmtree('anim')
+    rmtree('anim', ignore_errors = True)
     mkdir('anim')
         
     return (name, num_frames)
@@ -142,18 +142,15 @@ def second_pass( commands, num_frames ):
                 exit()
             
             step = (float(endValue) - startValue) / (float(endFrame - startFrame))
-            print step
+
             for f in range( startFrame, endFrame+1 ):
 
                 frame = frames[f]
                 
-                if startValue < endValue:
-                    value = (f - startFrame) * step + startValue
+                value = (f - startFrame) * step + startValue
 
                 frame[knob] = value
 
-    exit()
-            
     return frames
 
 def run(filename):
