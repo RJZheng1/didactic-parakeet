@@ -16,7 +16,7 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, constants, sh
         return
 
     p = 0
-    view = [0, 0, -1]
+    view = [0, 0, 1]
     vertex_normals = {}
     for i in xrange(len(point_sources)):
         point_sources[i] =  normalize(point_sources[i][0:3]) + point_sources[i][3:]
@@ -46,7 +46,7 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, constants, sh
 
     while p < len( points ) - 2:
 
-        if dot_product(view, calculate_normal( points, p )) < 0:
+        if dot_product(view, calculate_normal( points, p )) > 0:
             if shading_type == "wireframe":
                 draw_line( screen, points[p][0], points[p][1], points[p][2],
                            points[p+1][0], points[p+1][1], points[p][2], color, z_buffer )
@@ -233,10 +233,10 @@ def add_sphere( points, cx, cy, cz, r, step ):
             pz3 = temp[ index + 1 ][2]
       
             if longt != 0:
-                add_polygon( points, px0, py0, pz0, px1, py1, pz1, px2, py2, pz2 )
+                add_polygon( points, px0, py0, pz0, px2, py2, pz2, px1, py1, pz1 )
 
             if longt != longt_stop - 1:
-                add_polygon( points, px2, py2, pz2, px3, py3, pz3, px0, py0, pz0 )
+                add_polygon( points, px2, py2, pz2, px0, py0, pz0, px3, py3, pz3 )
             
             longt+= 1
         lat+= 1
@@ -307,8 +307,8 @@ def add_torus( points, cx, cy, cz, r0, r1, step ):
                 pz3 = temp[ (lat * num_steps) % num_points ][2]
 
 
-            add_polygon( points, px0, py0, pz0, px1, py1, pz1, px2, py2, pz2 );
-            add_polygon( points, px2, py2, pz2, px3, py3, pz3, px0, py0, pz0 );        
+            add_polygon( points, px0, py0, pz0, px2, py2, pz2, px1, py1, pz1 );
+            add_polygon( points, px2, py2, pz2, px0, py0, pz0, px3, py3, pz3 );        
             
             longt+= 1
         lat+= 1

@@ -46,4 +46,3 @@ def calculate_light(color, point_sources, constants, normal, view):
         ispecular = [ispecular[x] + (specular_light[x] if specular_light[x] > 0 else 0) for x in xrange(3)]
 
     return [min(255, int(iambient[x]+idiffuse[x]+ispecular[x])) for x in xrange(3)]
-        
