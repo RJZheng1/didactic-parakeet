@@ -295,7 +295,7 @@ def run(filename):
                 color = command[1:]
 
             elif command[0] == "light":
-                point_sources.append(command[1:])
+                point_sources.append(list(command[1:]))
 
             elif command[0] == "constants":
                 constants = command[1:]

@@ -1,8 +1,7 @@
 from display import *
 from matrix import *
 from gmath import *
-from math import cos, sin, pi, floor, pow
-from random import randint
+from math import cos, sin, pi, pow
 
 MAX_STEPS = 100
 
@@ -19,7 +18,9 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, constants, sh
     p = 0
     view = [0, 0, -1]
     vertex_normals = {}
-
+    for i in xrange(len(point_sources)):
+        point_sources[i] =  normalize(point_sources[i][0:3]) + point_sources[i][3:]
+    
     if shading_type == 'gouraud' or shading_type == 'phong':
         while p < len( points ) - 2:
             normal = calculate_normal(points, p)
@@ -55,49 +56,31 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, constants, sh
                            points[p][0], points[p][1], points[p][2], color, z_buffer)
                 
             elif shading_type == "flat":
-                c = []
-                
-                iambient = [color[x]*constants[x] for x in xrange(3)]
-                idiffuse = [0, 0, 0]
-                ispecular = [0, 0, 0]
-                
-                normal = normalize(calculate_normal(points, p))
-                
-                for light in point_sources:
-                    l = normalize(light[0:3])
-                    
-                    diffuse_light = [light[x+3]*constants[x+3]*dot_product(normal, l) for x in xrange(3)]
-                    idiffuse = [idiffuse[x] + (diffuse_light[x] if diffuse_light[x] > 0 else 0) for x in xrange(3)]
-                    
-                    angle = pow(dot_product(sub_vectors(scalar_product(scalar_product(normal, dot_product(l, normal)), 2), l), view), 2)
-                    specular_light = [light[x+3]*constants[x+6]*angle for x in xrange(3)]
-                    ispecular = [ispecular[x] + (specular_light[x] if specular_light[x] > 0 else 0) for x in xrange(3)]
-                    
-                c = [min(255, int(iambient[x]+idiffuse[x]+ispecular[x])) for x in xrange(3)]
+                c = calculate_light(color, point_sources, constants, normalize(calculate_normal(points, p)), view)
 
-                scanline_convert( points[p], points[p+1], points[p+2], screen, c, z_buffer, "flat", 0, 0, 0)
+                scanline_convert( points[p], points[p+1], points[p+2], screen, c, z_buffer, "flat")
 
             elif shading_type == "gouraud":
-                normal0 = vertex_normals(tuple(point[p]))
-                normal1 = vertex_normals(tuple(point[p+1]))
-                normal2 = vertex_normals(tuple(point[p+2]))
+                light0 = calculate_light(color, point_sources, constants, vertex_normals[tuple(point[p])], view)
+                light1 = calculate_light(color, point_sources, constants, vertex_normals[tuple(point[p+1])], view)
+                light2 = calculate_light(color, point_sources, constants, vertex_normals[tuple(point[p+2])], view)
                 
-                #scanline_convert( points[p], points[p+1], points[p+2], screen, 0, z_buffer, "gouraud", normal0, normal1, normal2)
+                scanline_convert( points[p] + light0, points[p+1] + light1, points[p+2] + light2, screen, 0, z_buffer, "gouraud" )
 
             elif shading_type == "phong":
                 normal0 = vertex_normals(tuple(point[p]))
                 normal1 = vertex_normals(tuple(point[p+1]))
                 normal2 = vertex_normals(tuple(point[p+2]))
                 
-                #scanline_convert( points[p], points[p+1], points[p+2], screen, 0, z_buffer, "phong", normal0, normal1, normal2)
+                scanline_convert( points[p] + normal0, points[p+1] + normal1, points[p+2] + normal2, screen, 0, z_buffer, "phong" )
             
         p += 3
 
-def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type, normal0, normal1, normal2):
+def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type):
     tri = sorted([p0, p1, p2], key = lambda p:p[1])
     for p in tri:
-        for i in xrange(len(p)):
-            p[i] = floor(p[i])
+        for i in xrange(min(len(p), 3)):
+            p[i] = round(p[i])
 
     if tri[2][1] != tri[0][1]:
         TBx = float((tri[2][0]-tri[0][0]))/(tri[2][1]-tri[0][1])
@@ -135,13 +118,16 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type, normal0,
         if (y >= tri[1][1] and tri[0][1] != tri[1][1]) or (tri[0][1] == tri[1][1]):
             x1 += TMx
             z1 += TMz
+
         else:
             x1 += MBx
             z1 += MBz
+            
         x0 += TBx
         z0 += TBz
-        if shading_type == "flat":
-            draw_line(screen, x0, y, z0, x1, y, z1, color, z_buffer)
+
+        draw_line(screen, x0, y, z0, x1, y, z1, color, z_buffer)
+
 
 def add_box( points, x, y, z, width, height, depth ):
     x1 = x + width
