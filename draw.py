@@ -64,7 +64,6 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, constants, sh
                 light0 = calculate_light(color, point_sources, constants, vertex_normals[tuple(points[p])], view)
                 light1 = calculate_light(color, point_sources, constants, vertex_normals[tuple(points[p+1])], view)
                 light2 = calculate_light(color, point_sources, constants, vertex_normals[tuple(points[p+2])], view)
-
                 scanline_convert( points[p] + [light0], points[p+1] + [light1], points[p+2] + [light2], screen, 0, z_buffer, "gouraud" )
 
             elif shading_type == "phong":
@@ -129,7 +128,7 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type):
             i0 = tri[0][4]
             i1 = tri[1][4]
 
-    for y in xrange(int(round(tri[0][1])), int(round(tri[2][1]))):
+    for y in xrange(int(tri[0][1]), int(tri[2][1])):
         if (y >= tri[1][1] and tri[0][1] != tri[1][1]) or (tri[0][1] == tri[1][1]):
             x1 += TMx
             z1 += TMz
@@ -162,6 +161,8 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type):
                 color = i1
                 di = scalar_product(di, -1)
         else:
+            if shading_type == "gouraud":
+                color = i0            
             plot(screen, [int(c) for c in color], x0, y, max(z0, z1), z_buffer)
             continue
 

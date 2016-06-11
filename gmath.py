@@ -42,10 +42,10 @@ def calculate_light(color, point_sources, constants, normal, view):
         l = light[0:3]
 
         diffuse_light = [light[x+3]*constants[x+3]*dot_product(normal, l) for x in xrange(3)]
-        idiffuse = [idiffuse[x] + (diffuse_light[x] if diffuse_light[x] > 0 else 0) for x in xrange(3)]
+        idiffuse = [idiffuse[x] + (diffuse_light[x] if diffuse_light[x] > 0 else idiffuse[x]) for x in xrange(3)]
 
         angle = pow(dot_product(sub_vectors(scalar_product(scalar_product(normal, dot_product(l, normal)), 2), l), view), 2)
         specular_light = [light[x+3]*constants[x+6]*angle for x in xrange(3)]
-        ispecular = [ispecular[x] + (specular_light[x] if specular_light[x] > 0 else 0) for x in xrange(3)]
+        ispecular = [ispecular[x] + (specular_light[x] if specular_light[x] > 0 else ispecular[x]) for x in xrange(3)]
 
-    return [min(255, int(iambient[x]+idiffuse[x]+ispecular[x])) for x in xrange(3)]
+    return [min(255, iambient[x]+idiffuse[x]+ispecular[x]) for x in xrange(3)]
