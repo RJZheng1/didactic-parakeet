@@ -100,8 +100,9 @@ def first_pass( commands ):
         print 'Animation code present but basename was not set. Using "frame" as basename.'
         name = 'frame'
 
-    rmtree('anim', ignore_errors = True)
-    mkdir('anim')
+    if frameCheck:
+        rmtree('anim', ignore_errors = True)
+        mkdir('anim')
         
     return (name, num_frames)
         

@@ -27,6 +27,9 @@ def scalar_product(v, s):
 def dot_product(v0, v1):
     return v0[0]*v1[0]+v0[1]*v1[1]+v0[2]*v1[2]
 
+def add_vectors(v0, v1):
+    return [v0[x]+v1[x] for x in xrange(len(v0))]
+
 def sub_vectors(v0, v1):
     return [v0[x]-v1[x] for x in xrange(len(v0))]
 
