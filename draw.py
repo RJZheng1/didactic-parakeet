@@ -58,24 +58,24 @@ def draw_polygons( points, screen, color, z_buffer, point_sources, constants, sh
             elif shading_type == "flat":
                 c = calculate_light(color, point_sources, constants, normalize(calculate_normal(points, p)), view)
 
-                scanline_convert( points[p], points[p+1], points[p+2], screen, c, z_buffer, "flat")
+                scanline_convert( points[p], points[p+1], points[p+2], screen, c, z_buffer, "flat", 0, 0, 0, 0 )
 
             elif shading_type == "gouraud":
                 light0 = calculate_light(color, point_sources, constants, vertex_normals[tuple(points[p])], view)
                 light1 = calculate_light(color, point_sources, constants, vertex_normals[tuple(points[p+1])], view)
                 light2 = calculate_light(color, point_sources, constants, vertex_normals[tuple(points[p+2])], view)
-                scanline_convert( points[p] + [light0], points[p+1] + [light1], points[p+2] + [light2], screen, 0, z_buffer, "gouraud" )
+                scanline_convert( points[p] + [light0], points[p+1] + [light1], points[p+2] + [light2], screen, 0, z_buffer, "gouraud", 0, 0, 0, 0 )
 
             elif shading_type == "phong":
-                normal0 = vertex_normals(tuple(point[p]))
-                normal1 = vertex_normals(tuple(point[p+1]))
-                normal2 = vertex_normals(tuple(point[p+2]))
+                normal0 = vertex_normals[tuple(points[p])]
+                normal1 = vertex_normals[tuple(points[p+1])]
+                normal2 = vertex_normals[tuple(points[p+2])]
                 
-                scanline_convert( points[p] + [normal0], points[p+1] + [normal1], points[p+2] + [normal2], screen, 0, z_buffer, "phong" )
+                scanline_convert( points[p] + [normal0], points[p+1] + [normal1], points[p+2] + [normal2], screen, 0, z_buffer, "phong", color, point_sources, constants, view )
             
         p += 3
 
-def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type):
+def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type, ambient, point_sources, constants, view):
     tri = sorted([p0, p1, p2], key = lambda p:p[1])
     for p in tri:
         for i in xrange(3):
@@ -84,7 +84,7 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type):
     if tri[2][1] != tri[0][1]:
         TBx = (tri[2][0]-tri[0][0])/(tri[2][1]-tri[0][1])
         TBz = (tri[2][2]-tri[0][2])/(tri[2][1]-tri[0][1])
-        if shading_type == "gouraud":
+        if shading_type == "gouraud" or shading_type == "phong":
             TBi = scalar_product(sub_vectors(tri[2][4], tri[0][4]), 1/(tri[2][1]-tri[0][1]))
     else:
         TBx = 0
@@ -94,7 +94,7 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type):
     if tri[2][1] != tri[1][1]:
         TMx = (tri[2][0]-tri[1][0])/(tri[2][1]-tri[1][1])
         TMz = (tri[2][2]-tri[1][2])/(tri[2][1]-tri[1][1])
-        if shading_type == "gouraud":
+        if shading_type == "gouraud" or shading_type == "phong":
             TMi = scalar_product(sub_vectors(tri[2][4], tri[1][4]), 1/(tri[2][1]-tri[1][1]))
     else:
         TMx = 0
@@ -104,7 +104,7 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type):
     if tri[1][1] != tri[0][1]:
         MBx = (tri[1][0]-tri[0][0])/(tri[1][1]-tri[0][1])
         MBz = (tri[1][2]-tri[0][2])/(tri[1][1]-tri[0][1])
-        if shading_type == "gouraud":
+        if shading_type == "gouraud" or shading_type == "phong":
             MBi = scalar_product(sub_vectors(tri[1][4], tri[0][4]), 1/(tri[1][1]-tri[0][1]))
     else:
         MBx = 0
@@ -116,7 +116,7 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type):
         z0 = tri[0][2]
         x1 = tri[0][0]
         z1 = tri[0][2]
-        if shading_type == "gouraud":
+        if shading_type == "gouraud" or shading_type == "phong":
             i0 = tri[0][4]
             i1 = tri[0][4]
     else:
@@ -124,7 +124,7 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type):
         z0 = tri[0][2]
         x1 = tri[1][0]
         z1 = tri[1][2]
-        if shading_type == "gouraud":
+        if shading_type == "gouraud" or shading_type == "phong":
             i0 = tri[0][4]
             i1 = tri[1][4]
 
@@ -132,21 +132,21 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type):
         if (y >= tri[1][1] and tri[0][1] != tri[1][1]) or (tri[0][1] == tri[1][1]):
             x1 += TMx
             z1 += TMz
-            if shading_type == "gouraud":
+            if shading_type == "gouraud" or shading_type == "phong":
                 i1 = add_vectors(i1, TMi)
         else:
             x1 += MBx
             z1 += MBz
-            if shading_type == "gouraud":
+            if shading_type == "gouraud" or shading_type == "phong":
                 i1 = add_vectors(i1, MBi)
 
         x0 += TBx
         z0 += TBz
-        if shading_type == "gouraud":
+        if shading_type == "gouraud" or shading_type == "phong":
             i0 = add_vectors(i0, TBi)
 
         dz = (z1-z0)/(x1-x0) if x1 != x0 else 0
-        if shading_type == "gouraud":
+        if shading_type == "gouraud" or shading_type == "phong":
             di = scalar_product(sub_vectors(i1, i0), 1/(x1-x0)) if x1 != x0 else [0, 0, 0]
 
         if x1 > x0:
@@ -154,23 +154,33 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type):
             z = z0
             if shading_type == "gouraud":
                 color = i0
+            elif shading_type == "phong":
+                normal = i0
         elif x0 > x1:
             x = x1
             z = z1
             if shading_type == "gouraud":
                 color = i1
+            elif shading_type == "phong":
+                normal = i1
         else:
             if shading_type == "gouraud":
                 color = i0
+            elif shading_type == "phong":
+                color = calculate_light(ambient, point_sources, constants, i0, view)
             plot(screen, [int(c) for c in color], x0, y, max(z0, z1), z_buffer)
             continue
 
         while x <= max(x0, x1):
+            if shading_type == "phong":
+                color = calculate_light(ambient, point_sources, constants, normal, view)
             plot(screen, [int(c) for c in color], x, y, z, z_buffer)
             x += 1
             z += dz
             if shading_type == "gouraud":
                 color = add_vectors(color, di)
+            elif shading_type == "phong":
+                normal = add_vectors(normal, di)
 
 def add_box( points, x, y, z, width, height, depth ):
     x1 = x + width
