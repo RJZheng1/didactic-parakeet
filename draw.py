@@ -162,7 +162,7 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type):
                 di = scalar_product(di, -1)
         else:
             if shading_type == "gouraud":
-                color = i0            
+                color = i0
             plot(screen, [int(c) for c in color], x0, y, max(z0, z1), z_buffer)
             continue
 
