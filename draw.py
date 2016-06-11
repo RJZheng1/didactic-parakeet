@@ -159,7 +159,6 @@ def scanline_convert(p0, p1, p2, screen, color, z_buffer, shading_type):
             z = z1
             if shading_type == "gouraud":
                 color = i1
-                di = scalar_product(di, -1)
         else:
             if shading_type == "gouraud":
                 color = i0
