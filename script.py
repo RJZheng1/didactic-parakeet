@@ -305,4 +305,7 @@ def run(filename):
             fname = 'anim/%s%03d.png' % (name, f)
             print 'Drawing frame: ' + fname
             save_extension(screen, fname)
+            for x in xrange(XRES):
+                for y in xrange(YRES):
+                    z_buffer[x][y] = -float('inf')
             
