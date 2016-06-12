@@ -1,9 +1,11 @@
-constants 0.2 0.2 0.2 0.4 0.4 0.4 0.4 0.4 0.4
-ambient 10 10 10
-light 0 0 1 100 0 0
+constants .05 .05 .05 .9 .9 .9 .05 .05 .05
+ambient 25 25 25
+//light 0 0 1 100 0 0
 light 1 0 0 0 100 0
-light 0 1 0 0 0 100
-shading flat
+//light 0 1 0 0 0 100
+shading phong
+//
+//
 //body
 push
 move 250 250 0
