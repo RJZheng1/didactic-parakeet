@@ -19,6 +19,8 @@ def calculate_normal( points, i ):
 
 def normalize(v):
     magnitude = sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2])
+    if magnitude == 0:
+        return 0
     return [v[x]/magnitude for x in xrange(3)]
 
 def scalar_product(v, s):
